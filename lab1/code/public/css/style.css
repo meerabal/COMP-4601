@@ -1,0 +1,25 @@
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+body{
+  background-color: black;
+  color: #ffffff;
+  font-family: Tahoma, sans-serif;
+}
+
+a {
+  color: #ffffff;
+}
+
+textarea {
+  background-color: black;
+  color: #ffffff;
+  resize: none;
+}
+
+input {
+  background-color: black;
+  color: #ffffff;
+}

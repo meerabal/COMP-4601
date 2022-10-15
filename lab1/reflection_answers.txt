@@ -1,0 +1,66 @@
+Meera Balsara
+101152760
+
+Lab #2
+
+Reflection answers:
+
+1. Data stored in database:
+
+Two main collections:
+  1) products
+  - stores all the products along with their characteristics
+  - format:
+    {
+      _id: ObjectId,  // id in database
+      name: String,   // name of product
+      price: Number,  // price of product
+      dimensions: { x: Number | String, y: Number | String, z: Number | String}, // dimensions of product
+      stock: Number,  // quantity of product in stock
+      reviews: String[],  // list of reviews for the product
+      id?: Number     // optional id provided by original json file (unused)
+    }
+  - format example:
+    {
+      _id: ObjectId("633cc6751f769767fde045ef"),
+      name: 'egg',
+      price: 2,
+      dimensions: { x: 8, y: 10, z: 9 },
+      stock: 12,
+      reviews: [ 'hello', 'hhh' ]
+    }
+
+  2) orders
+  - stores all the orders 
+  - format:
+    {
+      _id: ObjectId,  // id in database
+      name: String,   // name of the person ordering
+      products: String[], // list of products in the order
+      count: Number[]     // quantity of each product ordered
+    }
+  - format example:
+    {
+      _id: ObjectId("633ccb6c1f769767fde045f0"),
+      name: 'unicorn',
+      products: [ '633cc6751f769767fde045ef' ],
+      count: [ 2 ]
+    }
+
+2. Structure of new order data:
+  {
+    _id: ObjectId,
+    name: String,
+    products: String[],
+    count: Number[]
+  }
+  where each entry in the products array corresponds to its respective quantity in the count array,
+  i.e., products[i] has quantity count[i] in a given order (where i is an int, i=0,1,2,...)
+  Sent to the server in the form of a JSON request, i.e., a post request containing JSON in the body.
+
+3. You can load data for a specific order with order id = ID by following the given url:
+  http://localhost:3000/orders/ID
+  i.e., sending a GET request to http://localhost:3000/orders/ID where ID is the id of the order you are trying to look up.
+  The products in the order contains an array of links to the product pages to provide easier access.
+
+Apologies for the incomplete submission, I rechecked the video and the audio seems to be working fine in my video submission as well as on the link to kaltura where I uploaded the video. Please let me know if it still doesn't work, I thought uploading it as an alt on mediaspace (kaltura) would be enough but I can create another alt link if need be.

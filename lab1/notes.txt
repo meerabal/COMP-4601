@@ -1,0 +1,22 @@
+requirements:
+
+1. product search
+-- GET using name, in-stock status
+-- sort products by in-stock
+
+2. add product (with all info)
+-- PUT json string (assign new id)
+
+3. retrieve product (with all info)
+-- GET by id
+-- return html / json as required
+
+4. add review to product 
+-- POST integer review in product (by id)
+-- can simply be a rating (1-10)
+
+5. retrieve, view reviews for specific product (html/json)
+-- GET reviews by id
+
+POST is to add new 
+PUT is to edit existing

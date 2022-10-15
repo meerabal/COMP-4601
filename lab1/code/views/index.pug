@@ -1,0 +1,24 @@
+doctype html
+head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    link(rel='stylesheet' type='text/css' href='/css/style.css')
+title Products
+
+body
+    textarea(id='searchField', cols="30", rows="5", placeholder="Enter product name") 
+    input(id='instockCheckbox' type='checkbox')
+    label(for="instockCheckbox") In stock?
+    button(id='searchButton') Search
+    br
+    textarea(id='addProductField', cols="30", rows="5", placeholder="Enter product json") 
+    button(id='addProductButton') Add Product 
+    p (enter json string, eg: {"name": "egg", "price": 2, "stock": 12})
+    if !products || products.length === 0
+        p No products in database yet
+    else
+        each product in products 
+            br
+            br
+            a(href="/product/" + product._id.toString()) ID: #{product._id.toString()} -- #{product.name} -- $#{product.price} -- DIM: #{product.dimensions.x}x#{product.dimensions.y}x#{product.dimensions.z} -- STOCK: #{product.stock}
+script(src="/js/products.js") 

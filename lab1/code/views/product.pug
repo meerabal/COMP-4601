@@ -1,0 +1,18 @@
+doctype html
+head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    link(rel='stylesheet' type='text/css' href='/css/style.css')
+title #{product.name}
+
+body
+    p ID: #{product._id.toString()} #{product.name} $#{product.price} DIM: #{product.dimensions.x}x#{product.dimensions.y}x#{product.dimensions.z} STOCK: #{product.stock}
+    br
+    textarea(id="reviewField", cols="30", rows="10", placeholder="Enter review") 
+    button(id='submitReviewButton') Submit
+    br
+    if product.reviews
+        each review in product.reviews 
+            p #{review}
+script(src="/js/product.js") 
+
