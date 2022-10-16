@@ -42,6 +42,7 @@ app.get("/", function (req, res, next) {
       title: { boost: 2 },
       content: { boost: 1 },
     },
+    bool: "AND",
   });
   let resultCount = result.length;
   result = result.slice(0, 10);
