@@ -25,21 +25,37 @@ const index = elasticlunr(function () {
 
 app.get("/", function (req, res, next) {
   let query = req.query.search;
-  console.log(`Querying for ${query}:`);
+  if (!query) {
+    res.status(200);
+    res.format({
+      html: function () {
+        res.render("index", { results: [], resultCount: 0 });
+      },
+      json: function () {
+        res.send(JSON.stringify([]));
+      },
+    });
+    return;
+  }
   let result = index.search(query, {
     fields: {
       title: { boost: 2 },
       content: { boost: 1 },
     },
   });
+  let resultCount = result.length;
   result = result.slice(0, 10);
   let resultObjArr = [];
   result.forEach((doc) => {
-    console.log(index.documentStore.getDoc(doc.ref));
-    resultObjArr.push(index.documentStore.getDoc(doc.ref));
+    let docResult = index.documentStore.getDoc(doc.ref);
+    docResult.score = doc.score;
+    resultObjArr.push(docResult);
   });
   res.status(200);
   res.format({
+    html: function () {
+      res.render("index", { results: resultObjArr, resultCount: resultCount });
+    },
     json: function () {
       res.send(JSON.stringify(resultObjArr));
     },
