@@ -1,0 +1,20 @@
+doctype html
+head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+title Search
+
+body
+    textarea(id='searchField', cols="30", rows="5", placeholder="Enter search query") 
+    button(id='searchButton') Search
+    br
+    if !results || results.length === 0
+        p No results found for query
+    else
+        p Original result count: #{resultCount}
+        each result in results 
+            br
+            p Title: #{result.title} || Score: #{result.score} || ID: #{result._id} 
+            a(href=result.link) #{result.link}
+            p Content: #{result.content}
+script(src="/javascripts/index.js") 
