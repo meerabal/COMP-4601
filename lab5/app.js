@@ -95,6 +95,7 @@ mc.connect("mongodb://localhost:27017", function (err, client) {
         const item = result[i];
         if (item.outgoing.length === 0) {
           let row = new Array(N).fill(1 / N);
+          matrixList[i] = row;
           continue;
         }
 
