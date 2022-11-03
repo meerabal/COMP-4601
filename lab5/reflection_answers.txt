@@ -1,47 +1,10 @@
 Meera Balsara
 101152760
 
-Lab #4
+Lab #5
 
 Reflection answers:
 
-1. In the beginning, before I start listening for requests, I call find() on the "links" table in my database which contains information about all the pages (_id, title, content, children, link). Inside it, once I get the results of the find() operation, I use it to populate the index.
+1. I used the order of the array returned after querying the database. Firstly I check which links are at which array positions. After that, I create a 2D array with the outgoing links for each page. Each row will contain an array of 1s and 0s. So if the array has N-7 at position 0 and N-0 at position 5, and N-7 has an outgoing link to N-0, the 5th column in row 0 will be set to 1. 
 
-2. I am performing indexing on all the given fields: _id, title, content, children, link. The _id field is considered the reference.
-
-  const index = elasticlunr(function () {
-    this.addField("title");
-    this.addField("link");
-    this.addField("children");
-    this.addField("content");
-    this.setRef("_id");
-  });
-
-3. The search score is computed by elasticlunr's algorithm which uses combined boolean model, TF/IDF model and the vector space model. Since I have set the bool variable to "AND", it checks all the fields and considers the documents which have all the terms in the search query before applying the TF/IDF and vector space model.
-
-  let result = index.search(query, {
-    fields: {
-      title: { boost: 2 },
-      content: { boost: 1 },
-    },
-    bool: "AND",
-  });
-
-I also used boosting for my search since I wanted the search to prioritize looking for the term in the title first, and then in the content. 
-
-The TF-IDF weight is determined by using the formula:
-  w = log(1 + tf) * log(N / df)
-where w = weight
-tf = term frequency of a term t in document d
-N = total number of documents
-df = document frequency of term t
-
-And vector space model uses cosine similarity to find a measure in the range [0, 1] where 1 is an exact match.
-
-elasticlunr is based on lunr.js and the score computation looks like this: https://github.com/olivernn/lunr.js/blob/aa5a878f62a6bba1e8e5b95714899e17e8150b38/lib/builder.js#L289
-
-All this means that the score relies on how many documents a given term appears in out of the total number of documents, as well as the ratio of how the times the term appears in a document to the total number of words in the document. 
-
-If the term appears in a given document often, it means that the document must be related to the term quite a bit (so it should increase the score). But if the term is common in all documents (for example terms like: the, a, is, etc.), it should lower the score.
-
-4. My implementation is better suited for a smaller scale. For larger datasets it might be wiser to decrease recall and increase precision, and use lunr instead of elasticlunr. Another option would be to make a tradeoff between memory storage and speed -- if we index it in a way that it can store more relevant search terms for each document, it can enable faster recall at the expense of storing more data.
+2. With lower alpha values, we achieve convergence faster. This means that if alpha (the probability of teleporting to a random node) is low, we would need fewer iterations to refine the steady state probabilities to get it below a certain threshold. This is mentioned in the slides and reading material.
