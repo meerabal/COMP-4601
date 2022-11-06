@@ -8,8 +8,7 @@ title Result
 body
     p ID: #{result._id.toString()} 
     p #{result.title}
-    p #{result.link}
-    p #{result.title}
+    a(href=result.link) #{result.link}
     br
     p Incoming: 
     each link in result.incoming 
