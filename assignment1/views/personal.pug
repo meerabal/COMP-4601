@@ -1,0 +1,22 @@
+doctype html
+head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+title Personal
+
+body
+    textarea(id='searchField', cols="30", rows="1", placeholder="Enter search query")
+    input(id='pageRankCheckbox' type='checkbox')
+    label(for="pageRankCheckbox") Boost by PageRank?
+    textarea(id='numResultsField', cols="3", rows="1", placeholder="10")
+    button(id='searchButton') Search
+    br
+    if !results || results.length === 0
+        p No results found for query
+    else
+        p Original result count: #{resultCount}
+        each result in results 
+            br
+            a(href="/personal/"+result._id) Title: #{result.title} || Score: #{result.score} || ID: #{result._id} 
+            br
+script(src="/javascripts/personal.js") 

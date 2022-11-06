@@ -1,0 +1,26 @@
+doctype html
+head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    link(rel='stylesheet' type='text/css' href='/css/style.css')
+title Result
+
+body
+    p ID: #{result._id.toString()} 
+    p #{result.title}
+    p #{result.link}
+    p #{result.title}
+    br
+    p Incoming: 
+    each link in result.incoming 
+      br
+      a(href=link) #{link}
+    p Outgoing: 
+    each link in result.outgoing 
+      br
+      a(href=link) #{link}
+    br
+    p Content map: 
+    each key in Object.keys(result.contentMap) 
+      p #{key} : #{result.contentMap[key]}
+
