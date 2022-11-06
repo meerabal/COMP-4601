@@ -38,6 +38,10 @@ const fruitsIndex = elasticlunr(function () {
     limit: number of results required -- min 1, max 50, default 10
 */
 
+app.get("/", function (req, res, next) {
+  res.status(200).render("index");
+});
+
 app.get("/personal", function (req, res, next) {
   let query = req.query.q;
   let numResults = 10;
