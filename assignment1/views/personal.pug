@@ -20,6 +20,9 @@ body
         p Original result count: #{resultCount}
         each result in results 
             br
-            a(href="/personal/"+result._id) Title: #{result.title} || Score: #{result.score} || ID: #{result._id} 
+            p ---
+            a(href="/personal/"+result._id) Title: #{result.title} 
+            p PageRank: #{result.pageRank} || Score: #{result.score} || ID: #{result._id} 
+            a(href=result.link) #{result.link}
             br
 script(src="/javascripts/personal.js") 
