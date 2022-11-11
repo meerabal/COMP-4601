@@ -3,6 +3,14 @@ Meera Balsara
 
 Assignment 1
 
+Instance details for OpenStack: 
+Name: MeeraB. 4601
+IP: 192.168.72.93, 134.117.133.66
+
+Video link:
+https://carleton-ca.zoom.us/rec/share/NM4OhwyxnpYHNIKwm8AHN442MN7hUMC5sXWOWsdXkfsGEoJB_GhJDel257MhwA9V.ituXeDrbugg1Dkty?startTime=1667789679000
+Passcode: mXp**T&8
+
 1. The crawler extracts content, links from the pages. It stores the data as maps until it is processed and added to the database. Yes, there is some intermediary processing which is performed by running the pagerank code which calculated the pagerank for each page and updates the entries in the database.
 
 2. The server supports GET requests for getting the index (which contains links to the two main pages), getting the fruits and personal website search pages.
