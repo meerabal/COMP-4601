@@ -11,6 +11,7 @@ let u_sum = {};
 let u_num = {};
 let u_avgs = {};
 let sim = {};
+let neighbourhoodSize = 2;
 
 const readFileFromPath = (path) => {
   try {
@@ -150,7 +151,7 @@ const pred1 = (a, p) => {
   let keysSorted = Object.keys(sim[a]).sort((x, y) => {
     return sim[a][y] - sim[a][x];
   });
-  for (let u2 of keysSorted.slice(0, 2)) {
+  for (let u2 of keysSorted.slice(0, neighbourhoodSize)) {
     let avg2 = u_sum[u2] / u_num[u2];
 
     num += (r[u2][p] - avg2) * sim[a][u2];
