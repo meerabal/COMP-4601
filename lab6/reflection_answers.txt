@@ -1,0 +1,9 @@
+Meera Balsara
+101152760
+
+Lab 6
+
+1. While parsing the data from the file string to objects and arrays, it keeps a sum (u_sum[user]) of the rating from each user and increments u_num[user] by 1 so that it keeps count of the number of ratings being considered. Before updating either of the two, there is an if condition to check if the rating is missing (or -1), and if true then it skips the update to u_sum and u_num which are later used to find average. 
+While calculating similarity, there is an if condition to check that for a given product, if either user has no rating (entry of -1), it skips adding those values to the calculation.
+
+2. I have pre-computed the u_sum and u_num which I later use for average. I could have pre-calculated the averages itself as well. I also had separate functions which calculated similarity between only two users instead of calculating similarity between all, and another function that calculated predictions by calling such a function -- but I commented it out because I thought it would be more work overall. The current solutions computes similarity matrix for all the users just once and it works for all the predictions. There could be more optimizations for space as well (storing fewer data structures), but I tried to keep arrays and objects for faster access. If there are any other optimizations that could be made, please let me know in the feedback, I will try to improve on it.
