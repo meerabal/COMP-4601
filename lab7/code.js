@@ -87,14 +87,19 @@ const pred = (user, prod) => {
     return sim[prod][y] - sim[prod][x];
   });
 
-  for (let i of keysSorted.slice(0, neighbourhoodSize)) {
-    if (sim[prod][i] < 0) {
+  let count = 0;
+  for (let i of keysSorted) {
+    if (r[user][i] === -1 || sim[prod][i] <= 0) {
       continue;
     }
     let rui = r[user][i];
 
     num += sim[i][prod] * rui;
     denom += sim[i][prod];
+    count++;
+    if (count === neighbourhoodSize) {
+      break;
+    }
   }
   let predScore = num / denom;
   return predScore;
@@ -118,7 +123,7 @@ const printOut = () => {
   console.log(outStr);
 };
 
-let fileContent = readFileFromPath("./testa.txt");
+let fileContent = readFileFromPath("./test2.txt");
 // populate u, p, r
 parseInput(fileContent);
 // get sim matrix
