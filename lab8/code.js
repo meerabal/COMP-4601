@@ -4,22 +4,19 @@
 const fs = require("fs");
 
 // TODO: change this to 5
-const neighbourhoodSize = 2;
+const neighbourhoodSize = 5;
 // TODO: switch these for final dataset
-const noRating = -1;
+const noRating = 0;
 const leftOutRating = 0;
 let n = 0;
 let m = 0;
 let u = [];
 let p = [];
 let r = {}; // could be Map
-let simNum = {};
-let simDenomSq1 = {};
-let simDenomSq2 = {};
 let u_sum = {};
 let u_num = {};
-let u_avgs = {};
 let sim = {};
+let usersWhoRatedItem = {};
 
 const readFileFromPath = (path) => {
   try {
@@ -58,6 +55,10 @@ const parseInput = (str) => {
       if (Number(u_i_ratings[j]) !== noRating) {
         u_sum[u[i]] += parseFloat(u_i_ratings[j]);
         u_num[u[i]] += 1;
+        if (usersWhoRatedItem[p[j]] === undefined) {
+          usersWhoRatedItem[p[j]] = [];
+        }
+        usersWhoRatedItem[p[j]].push(u[i]);
       }
     }
   }
@@ -75,9 +76,9 @@ const simBet = (a, b) => {
   let diff_sq_1 = 0;
   let diff_sq_2 = 0;
 
-  for (let user of u) {
+  for (let user of usersWhoRatedItem[a]) {
     let ru = u_sum[user] / u_num[user];
-    if (r[user][a] === noRating || r[user][b] === noRating) {
+    if (r[user][b] === noRating) {
       continue;
     }
     num += (r[user][a] - ru) * (r[user][b] - ru);
