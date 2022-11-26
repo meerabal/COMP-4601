@@ -1,6 +1,8 @@
 // Lab 8 - Leave one out and MAE
 // item based, ignoring negative similarities
 
+const start = Date.now();
+
 const fs = require("fs");
 
 // TODO: change this to 5
@@ -17,6 +19,7 @@ let u_sum = {};
 let u_num = {};
 let sim = {};
 let usersWhoRatedItem = {};
+let usefulSims = {};
 
 const readFileFromPath = (path) => {
   try {
@@ -39,7 +42,7 @@ const parseInput = (str) => {
   u = lineArr[1].split(" ").slice(0, u.length - 1);
 
   // product names
-  p = lineArr[2].split(" ");
+  p = lineArr[2].split(" ").slice(0, p.length - 1);
 
   // going through each row (user ratings)
   for (let i = 0; i < n; i++) {
@@ -76,6 +79,11 @@ const simBet = (a, b) => {
   let diff_sq_1 = 0;
   let diff_sq_2 = 0;
 
+  if (!usersWhoRatedItem[a]) {
+    usersWhoRatedItem[a] = [];
+    usefulSims[a] = [];
+    return;
+  }
   for (let user of usersWhoRatedItem[a]) {
     let ru = u_sum[user] / u_num[user];
     if (r[user][b] === noRating) {
@@ -86,7 +94,12 @@ const simBet = (a, b) => {
     diff_sq_2 += Math.pow(r[user][b] - ru, 2);
   }
   sim[a][b] = num / (Math.sqrt(diff_sq_1) * Math.sqrt(diff_sq_2));
-
+  if (sim[a][b] > 0) {
+    if (usefulSims[a] === undefined) {
+      usefulSims[a] = [];
+    }
+    usefulSims[a].push(b);
+  }
   // return sim[a][b];
 };
 
@@ -168,7 +181,7 @@ const pred = (user, prod, newSim) => {
   for (let n = 0; n < neighbourhoodSize; n++) {
     let maxI = null;
     let maxVal = 0;
-    for (let i in sim[prod]) {
+    for (let i of usefulSims[prod]) {
       // console.log(i, "->", sim[prod][i], "max", maxVal, maxI);
       if (r[user][i] === noRating || sim[prod][i] <= 0 || isNaN(sim[prod][i])) {
         continue;
@@ -178,6 +191,7 @@ const pred = (user, prod, newSim) => {
         maxI = i;
       }
     }
+
     if (maxVal > 0 && maxI !== null) {
       count++;
       neighbourList.push(maxI);
@@ -281,3 +295,8 @@ const leaveOneOut = () => {
 console.log(leaveOneOut());
 console.log(totalPred);
 console.log(noValidNeighbours);
+
+const end = Date.now();
+console.log(`Started at ${start.toLocaleString}`);
+console.log(`Execution time: ${end - start} ms`);
+console.log(`Ended at ${end.toLocaleString}`);
