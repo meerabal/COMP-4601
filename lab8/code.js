@@ -13,6 +13,9 @@ let m = 0;
 let u = [];
 let p = [];
 let r = {}; // could be Map
+let simNum = {};
+let simDenomSq1 = {};
+let simDenomSq2 = {};
 let u_sum = {};
 let u_num = {};
 let u_avgs = {};
@@ -36,7 +39,7 @@ const parseInput = (str) => {
   m = Number(strArr[1]);
 
   // user names
-  u = lineArr[1].split(" ");
+  u = lineArr[1].split(" ").slice(0, u.length - 1);
 
   // product names
   p = lineArr[2].split(" ");
@@ -50,10 +53,10 @@ const parseInput = (str) => {
     u_num[u[i]] = 0;
 
     for (let j = 0; j < m; j++) {
-      r[u[i]][p[j]] = Number(u_i_ratings[j]);
+      r[u[i]][p[j]] = parseFloat(u_i_ratings[j]);
       // keep running sum for ratings of u[i]
       if (Number(u_i_ratings[j]) !== noRating) {
-        u_sum[u[i]] += Number(u_i_ratings[j]);
+        u_sum[u[i]] += parseFloat(u_i_ratings[j]);
         u_num[u[i]] += 1;
       }
     }
@@ -63,14 +66,14 @@ const parseInput = (str) => {
 // a = product 1
 // b = product 2
 const simBet = (a, b) => {
-  if (sim[a][b]) {
+  if (sim[a] && sim[a][b]) {
     return sim[a][b];
+  } else if (sim[a] === undefined) {
+    sim[a] = {};
   }
   let num = 0;
   let diff_sq_1 = 0;
   let diff_sq_2 = 0;
-
-  let numstr = "";
 
   for (let user of u) {
     let ru = u_sum[user] / u_num[user];
@@ -78,7 +81,6 @@ const simBet = (a, b) => {
       continue;
     }
     num += (r[user][a] - ru) * (r[user][b] - ru);
-    numstr += r[user][a] - ru + "*" + (r[user][b] - ru) + "+";
     diff_sq_1 += Math.pow(r[user][a] - ru, 2);
     diff_sq_2 += Math.pow(r[user][b] - ru, 2);
   }
@@ -87,10 +89,10 @@ const simBet = (a, b) => {
   // return sim[a][b];
 };
 
-const simOf = (a) => {
+const simOf = (user, a) => {
   sim[a] = {};
   for (let prod of p) {
-    if (a === prod) {
+    if (a === prod || r[user][p] === noRating) {
       continue;
     }
     simBet(a, prod);
@@ -116,27 +118,58 @@ const simOf = (a) => {
 //         diff_sq_1 += Math.pow(r[user][a] - ru, 2);
 //         diff_sq_2 += Math.pow(r[user][b] - ru, 2);
 //       }
+
+//       if (simNum[a] === undefined) simNum[a] = {};
+//       simNum[a][b] = num;
+//       simNum[a] = {};
+//       if (simDenomSq1[a] === undefined) simDenomSq1[a] = {};
+//       simDenomSq1[a][b] = diff_sq_1;
+//       simDenomSq1[a] = {};
+//       if (simDenomSq2[a] === undefined) simDenomSq2[a] = {};
+//       simDenomSq2[a][b] = diff_sq_2;
+//       simDenomSq2[a] = {};
+
 //       sim[a][b] = num / (Math.sqrt(diff_sq_1) * Math.sqrt(diff_sq_2));
 //     }
 //   }
 // };
 
+// const recalculateSim = (user, prod) => {
+//   let newSim = { ...sim };
+//   let num = 0;
+//   let diff_sq_1 = 0;
+//   let diff_sq_2 = 0;
+//   let ru = (u_sum[user] - r[user][prod]) / (u_num[user] - 1);
+
+//   for (let b of p) {
+//     if (b === prod || r[user][b] === noRating) continue;
+
+//     num = (r[user][prod] - ru) * (r[user][b] - ru);
+//     diff_sq_1 = Math.pow(r[user][prod] - ru, 2);
+//     diff_sq_2 = Math.pow(r[user][b] - ru, 2);
+//     newSim[prod][b] = num / (Math.sqrt(diff_sq_1) * Math.sqrt(diff_sq_2));
+//   }
+
+//   return newSim;
+// };
+
 let noValidNeighbours = 0;
 
-const pred = (user, prod) => {
+const pred = (user, prod, newSim) => {
+  // console.log("\n\nPredicting for user:", user);
+  // console.log("Predicting for item:", prod);
   let num = 0;
   let denom = 0;
 
   let count = 0;
   let neighbourList = [];
-
-  simOf(prod);
-
+  simOf(user, prod);
   for (let n = 0; n < neighbourhoodSize; n++) {
     let maxI = null;
     let maxVal = 0;
     for (let i in sim[prod]) {
-      if (r[user][i] === noRating || sim[prod][i] <= 0) {
+      // console.log(i, "->", sim[prod][i], "max", maxVal, maxI);
+      if (r[user][i] === noRating || sim[prod][i] <= 0 || isNaN(sim[prod][i])) {
         continue;
       }
       if (maxVal < sim[prod][i] && !neighbourList.includes(i)) {
@@ -150,14 +183,17 @@ const pred = (user, prod) => {
     }
   }
   if (count < neighbourhoodSize) {
-    console.log("only", count, "/", neighbourhoodSize, "neighbours");
+    // console.log("only", count, "/", neighbourhoodSize, "neighbours");
   }
+
+  // console.log("Found", count, "valid neighbours:");
   // console.log(neighbourList);
   for (let i of neighbourList) {
+    simBet(i, prod);
+    // console.log("- Item", i, "sim=", sim[prod][i]);
     let rui = r[user][i];
-    simOf(i, prod);
-    num += sim[i][prod] * rui;
-    denom += sim[i][prod];
+    num += sim[prod][i] * rui;
+    denom += sim[prod][i];
   }
   // DONE: what if count is 0?
   if (count === 0) {
@@ -167,29 +203,29 @@ const pred = (user, prod) => {
   }
 
   let predScore = num / denom;
-  console.log("predScore", predScore, "\n");
+  // console.log("predScore", predScore, "\n");
   return predScore;
 };
 
-const printOut = () => {
-  let outStr = "";
-  outStr += n + " " + m + "\n";
-  outStr += u.join(" ") + "\n" + p.join(" ") + "\n";
-  for (let user of u) {
-    for (let prod of p) {
-      let rating = r[user][prod];
-      if (rating === noRating) {
-        outStr += pred(user, prod) + " ";
-      } else {
-        outStr += rating.toString() + " ";
-      }
-    }
-    outStr += "\n";
-  }
-  console.log(outStr);
-};
+// const printOut = () => {
+//   let outStr = "";
+//   outStr += n + " " + m + "\n";
+//   outStr += u.join(" ") + "\n" + p.join(" ") + "\n";
+//   for (let user of u) {
+//     for (let prod of p) {
+//       let rating = r[user][prod];
+//       if (rating === noRating) {
+//         outStr += pred(user, prod) + " ";
+//       } else {
+//         outStr += rating.toString() + " ";
+//       }
+//     }
+//     outStr += "\n";
+//   }
+//   console.log(outStr);
+// };
 
-let fileContent = readFileFromPath("./test2.txt");
+let fileContent = readFileFromPath("./parsed-data-trimmed.txt");
 // populate u, p, r
 parseInput(fileContent);
 // get sim matrix
@@ -206,15 +242,33 @@ let totalPred = 0;
 
 let rec = {};
 const leaveOneOut = () => {
+  let maeNum = 0;
+  let maeDenom = 0;
   for (let user of u) {
     rec[user] = {};
     for (let prod of p) {
       if (r[user][prod] !== noRating) {
+        console.log("Crossing out user", user, "and product", prod);
+        let tempHold = r[user][prod];
+        r[user][prod] = noRating;
         totalPred += 1;
-        rec[user][prod] = pred(user, prod);
+        // let newSim = recalculateSim(user, prod);
+        // calculateSim();
+        // console.log("sim =================");
+        // console.log(sim);
+        // console.log("newSim ==============");
+        // console.log(newSim);
+        rec[user][prod] = pred(user, prod, sim);
+        // console.log("Initial predicted value: ", tempHold);
+        // console.log("Final predicted value:", rec[user][prod]);
+        r[user][prod] = tempHold;
+        // calculateSim();
+        maeNum += Math.abs(rec[user][prod] - r[user][prod]);
+        maeDenom += 1;
       }
     }
   }
+  return maeNum / maeDenom;
 };
 
 // mae
@@ -223,21 +277,6 @@ const leaveOneOut = () => {
 //  sum abs ( difference between pred and original )
 //  sum num elements in predicted ratings
 
-const mae = () => {
-  let num = 0;
-  let denom = 0;
-  for (let user of u) {
-    for (let i in rec[user]) {
-      // console.log(rec[user]);
-      num += Math.abs(rec[user][i] - r[user][i]);
-      denom += 1;
-    }
-  }
-  let maeVal = num / denom;
-  return maeVal;
-};
-
-leaveOneOut();
-console.log(mae());
+console.log(leaveOneOut());
 console.log(totalPred);
 console.log(noValidNeighbours);
