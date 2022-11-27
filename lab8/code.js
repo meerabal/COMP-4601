@@ -6,9 +6,9 @@ const start = Date.now();
 const fs = require("fs");
 
 // TODO: change this to 5
-const neighbourhoodSize = 5;
+const neighbourhoodSize = 2;
 // TODO: switch these for final dataset
-const noRating = 0;
+const noRating = -1;
 const leftOutRating = 0;
 let n = 0;
 let m = 0;
@@ -58,10 +58,10 @@ const parseInput = (str) => {
       if (Number(u_i_ratings[j]) !== noRating) {
         u_sum[u[i]] += parseFloat(u_i_ratings[j]);
         u_num[u[i]] += 1;
-        if (usersWhoRatedItem[p[j]] === undefined) {
-          usersWhoRatedItem[p[j]] = [];
-        }
-        usersWhoRatedItem[p[j]].push(u[i]);
+        // if (usersWhoRatedItem[p[j]] === undefined) {
+        //   usersWhoRatedItem[p[j]] = new Set();
+        // }
+        // usersWhoRatedItem[p[j]].add(u[i]);
       }
     }
   }
@@ -79,14 +79,14 @@ const simBet = (a, b) => {
   let diff_sq_1 = 0;
   let diff_sq_2 = 0;
 
-  if (!usersWhoRatedItem[a]) {
-    usersWhoRatedItem[a] = [];
-    usefulSims[a] = [];
-    return;
-  }
-  for (let user of usersWhoRatedItem[a]) {
+  // if (!usersWhoRatedItem[a]) {
+  //   usersWhoRatedItem[a] = new Set();
+  //   usefulSims[a] = new Set();
+  //   // return;
+  // }
+  for (let user of u) {
     let ru = u_sum[user] / u_num[user];
-    if (r[user][b] === noRating) {
+    if (r[user][a] === noRating || r[user][b] === noRating) {
       continue;
     }
     num += (r[user][a] - ru) * (r[user][b] - ru);
@@ -96,9 +96,9 @@ const simBet = (a, b) => {
   sim[a][b] = num / (Math.sqrt(diff_sq_1) * Math.sqrt(diff_sq_2));
   if (sim[a][b] > 0) {
     if (usefulSims[a] === undefined) {
-      usefulSims[a] = [];
+      usefulSims[a] = new Set();
     }
-    usefulSims[a].push(b);
+    usefulSims[a].add(b);
   }
   // return sim[a][b];
 };
@@ -169,7 +169,7 @@ const simOf = (user, a) => {
 
 let noValidNeighbours = 0;
 
-const pred = (user, prod, newSim) => {
+const pred = (user, prod) => {
   // console.log("\n\nPredicting for user:", user);
   // console.log("Predicting for item:", prod);
   let num = 0;
@@ -182,7 +182,6 @@ const pred = (user, prod, newSim) => {
     let maxI = null;
     let maxVal = 0;
     for (let i of usefulSims[prod]) {
-      // console.log(i, "->", sim[prod][i], "max", maxVal, maxI);
       if (r[user][i] === noRating || sim[prod][i] <= 0 || isNaN(sim[prod][i])) {
         continue;
       }
@@ -195,6 +194,7 @@ const pred = (user, prod, newSim) => {
     if (maxVal > 0 && maxI !== null) {
       count++;
       neighbourList.push(maxI);
+      console.log(maxVal, maxI, neighbourList);
     }
   }
   if (count < neighbourhoodSize) {
@@ -240,7 +240,7 @@ const pred = (user, prod, newSim) => {
 //   console.log(outStr);
 // };
 
-let fileContent = readFileFromPath("./parsed-data-trimmed.txt");
+let fileContent = readFileFromPath("./test3.txt");
 // populate u, p, r
 parseInput(fileContent);
 // get sim matrix
@@ -262,27 +262,29 @@ const leaveOneOut = () => {
   for (let user of u) {
     rec[user] = {};
     for (let prod of p) {
-      if (r[user][prod] !== noRating) {
-        console.log("Crossing out user", user, "and product", prod);
-        let tempHold = r[user][prod];
-        r[user][prod] = noRating;
-        totalPred += 1;
-        // let newSim = recalculateSim(user, prod);
-        // calculateSim();
-        // console.log("sim =================");
-        // console.log(sim);
-        // console.log("newSim ==============");
-        // console.log(newSim);
-        rec[user][prod] = pred(user, prod, sim);
-        // console.log("Initial predicted value: ", tempHold);
-        // console.log("Final predicted value:", rec[user][prod]);
-        r[user][prod] = tempHold;
-        // calculateSim();
-        maeNum += Math.abs(rec[user][prod] - r[user][prod]);
-        maeDenom += 1;
+      if (r[user][prod] === noRating) {
+        continue;
       }
+      console.log("Crossing out user", user, "and product", prod);
+      let tempHold = r[user][prod];
+      r[user][prod] = noRating;
+      totalPred += 1;
+      // let newSim = recalculateSim(user, prod);
+      // calculateSim();
+      // console.log("sim =================");
+      // console.log(sim);
+      // console.log("newSim ==============");
+      // console.log(newSim);
+      rec[user][prod] = pred(user, prod);
+      // console.log("Initial predicted value: ", tempHold);
+      // console.log("Final predicted value:", rec[user][prod]);
+      r[user][prod] = tempHold;
+      // calculateSim();
+      maeNum += Math.abs(rec[user][prod] - r[user][prod]);
+      maeDenom += 1;
     }
   }
+
   return maeNum / maeDenom;
 };
 
@@ -297,6 +299,6 @@ console.log(totalPred);
 console.log(noValidNeighbours);
 
 const end = Date.now();
-console.log(`Started at ${start.toLocaleString}`);
+console.log(`Started at ${start.toLocaleString()}`);
 console.log(`Execution time: ${end - start} ms`);
-console.log(`Ended at ${end.toLocaleString}`);
+console.log(`Ended at ${end.toLocaleString()}`);
