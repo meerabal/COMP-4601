@@ -1,11 +1,12 @@
 const fs = require("fs");
 
-const filename = "test.txt";
+const filename = "test5.txt";
 const pathLength = 3;
 const noRating = 0;
 let u = [];
 let p = [];
 let userLiked = {};
+let itemLikers = {};
 
 const readFileFromPath = (path) => {
   try {
@@ -36,8 +37,14 @@ const parseInput = (str) => {
     userLiked[u[i]] = [];
     // going through each column of each row (rating from user[i] for each product j)
     for (let j = 0; j < m; j++) {
+      if (!itemLikers[p[j]]) {
+        itemLikers[p[j]] = [];
+      }
       if (Number(u_i_ratings[j]) !== noRating) {
         userLiked[u[i]].push(p[j]);
+        if (!(u[i] in itemLikers[p[j]])) {
+          itemLikers[p[j]].push(u[i]);
+        }
       }
     }
   }
@@ -46,4 +53,41 @@ const parseInput = (str) => {
 let fileContent = readFileFromPath(filename);
 // populate u, p, r
 parseInput(fileContent);
-console.log(userLiked);
+// console.log(userLiked);
+// console.log(itemLikers);
+
+const startUser = "User1";
+let itemsWithPathCount = {};
+for (let i = 0; i < p.length; i++) {
+  itemsWithPathCount[p[i]] = 0;
+}
+
+for (let i = 0; i < userLiked[startUser].length; i++) {
+  let item = userLiked[startUser][i];
+  // itemsWithPathCount[item]++;
+  for (let j = 0; j < itemLikers[item].length; j++) {
+    let liker = itemLikers[item][j];
+    if (liker === startUser) continue;
+    for (let k = 0; k < userLiked[liker].length; k++) {
+      let likersLiked = userLiked[liker][k];
+      // if (likersLiked in userLiked[startUser]) continue;
+      itemsWithPathCount[likersLiked]++;
+    }
+  }
+}
+
+let keysFiltered = Object.keys(itemsWithPathCount).filter((x) => {
+  // console.log(x, userLiked[startUser], userLiked[startUser].includes(x));
+  return itemsWithPathCount[x] !== 0 && !userLiked[startUser].includes(x);
+});
+
+let keysSorted = keysFiltered.sort((x, y) => {
+  return itemsWithPathCount[y] - itemsWithPathCount[x];
+});
+// console.log(itemsWithPathCount);
+// console.log(keysFiltered);
+// console.log(keysSorted);
+
+for (let i = 0; i < keysSorted.length; i++) {
+  console.log(keysSorted[i], "-->", itemsWithPathCount[keysSorted[i]]);
+}
