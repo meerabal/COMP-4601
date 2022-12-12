@@ -50,6 +50,7 @@ const parseInput = (str) => {
       if (Number(u_i_ratings[j]) !== -1) {
         u_sum[u[i]] += Number(u_i_ratings[j]);
         u_num[u[i]] += 1;
+        // console.log(u_num);
       }
     }
   }
@@ -58,6 +59,7 @@ const parseInput = (str) => {
 const calculateSim = () => {
   for (let a of p) {
     sim[a] = {};
+    let numstr = "";
     for (let b of p) {
       if (a === b) {
         continue;
@@ -67,13 +69,22 @@ const calculateSim = () => {
       let diff_sq_2 = 0;
       for (let user of u) {
         let ru = u_sum[user] / u_num[user];
+        // console.log("ru", ru);
         if (r[user][a] === -1 || r[user][b] === -1) {
           continue;
         }
         num += (r[user][a] - ru) * (r[user][b] - ru);
+        numstr += r[user][a] - ru + "*" + (r[user][b] - ru) + "+";
+
         diff_sq_1 += Math.pow(r[user][a] - ru, 2);
         diff_sq_2 += Math.pow(r[user][b] - ru, 2);
       }
+      // console.log("for", a, ",", b, "===========");
+      // console.log("numstr", numstr);
+      // console.log("num", num);
+      // console.log("diffsq1", diff_sq_1);
+      // console.log("diffsq2", diff_sq_2);
+
       sim[a][b] = num / (Math.sqrt(diff_sq_1) * Math.sqrt(diff_sq_2));
       // console.log("sim[a][b] = ", sim[a][b]);
     }
@@ -86,7 +97,10 @@ const pred = (user, prod) => {
   let keysSorted = Object.keys(sim[prod]).sort((x, y) => {
     return sim[prod][y] - sim[prod][x];
   });
-
+  console.log(keysSorted);
+  for (let i of keysSorted.slice(0, 2)) {
+    console.log(i, "->", sim[prod][i]);
+  }
   let count = 0;
   for (let i of keysSorted) {
     if (r[user][i] === -1 || sim[prod][i] <= 0) {
@@ -114,6 +128,7 @@ const printOut = () => {
       let rating = r[user][prod];
       if (rating === -1) {
         outStr += pred(user, prod) + " ";
+        break;
       } else {
         outStr += rating.toString() + " ";
       }
@@ -123,10 +138,11 @@ const printOut = () => {
   console.log(outStr);
 };
 
-let fileContent = readFileFromPath("./test2.txt");
+let fileContent = readFileFromPath("./test3.txt");
 // populate u, p, r
 parseInput(fileContent);
 // get sim matrix
 calculateSim();
 // print out result with predictions
 printOut();
+// console.log(sim);

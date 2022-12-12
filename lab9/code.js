@@ -1,12 +1,11 @@
 const fs = require("fs");
 
 const filename = "test5.txt";
-const pathLength = 3;
 const noRating = 0;
 let u = [];
 let p = [];
-let userLiked = {};
-let itemLikers = {};
+let userLiked = {}; // {User: [items ...], ...}
+let itemLikers = {}; // {Item: [users ...], ...}
 
 const readFileFromPath = (path) => {
   try {
